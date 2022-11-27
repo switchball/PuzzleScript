@@ -25,7 +25,7 @@ async function solverClick_Fn() {
 
     // bfs(2048, updateGraph)
 
-    stateGraph = stateSearch()
+    stateGraph = stateSearch(8192)
     updateStateGraph(stateGraph)
 
     // restoreLevel(cache[0])
@@ -68,7 +68,7 @@ function stateSearch(limit=1000) {
         // 获取当前关卡的特征，使用 level.objects
         feature = [...level.objects].map((value, index) => { if ((value & 16) > 0) {return index} }).filter(e => e >= 0);
         node.setGroup(feature);
-        console.log(node);
+        // console.log(node);
 
         // for each action
         for (var action = 0; action < 4; action++) {
@@ -97,7 +97,7 @@ function stateSearch(limit=1000) {
             }
             loadLevelFromNodeDat(rootLevelDat);
         }
-        console.log(graph)
+        // console.log(graph)
 
         iteration ++;
 

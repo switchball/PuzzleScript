@@ -69,7 +69,7 @@ async function updateGraph(nodes, edges) {
     // nodes.selected().height(40);
     // for (var ic = 0; ic < 500; ic+= 100) {
     // set chart layout
-    chart.layout().iterationCount(100 + nodes.length / 2);
+    chart.layout().iterationCount(100 + nodes.length / 25);
 
     nodes = chart.nodes();
     nodes.normal().height(5);
