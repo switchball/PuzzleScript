@@ -3,3 +3,7 @@ bin/
 
 *.swp
 src - Kopie
+
+node_modules/
+package.json
+package-lock.json
