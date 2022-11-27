@@ -33,9 +33,13 @@ chart.listen('click', function(e) {
 })
 
 function updateStateGraph(stateGraph) {
-    var nodes = [...stateGraph.nodes.values()].map(function(arr) { return {id: arr.value} } )
+    // var nodes = [...stateGraph.nodes.values()].map(function(arr) { return {id: arr.value} } )
+    var nodes = []
     var edges = []
+    var color = ''
     for (let node of stateGraph.nodes.values()) {
+        color = node.visited ? '#00aa00' : '#ffa000'
+        nodes.push({id: node.value, fill: color, stroke: '1 #333333'})
         for (let dest of node.getAdjacents()) {
             edges.push({from: node.value, to: dest.value})
         }
@@ -60,7 +64,7 @@ async function updateGraph(nodes, edges) {
     // nodes.selected().height(40);
     // for (var ic = 0; ic < 500; ic+= 100) {
     // set chart layout
-    chart.layout().iterationCount(100 + nodes.length);
+    chart.layout().iterationCount(100 + nodes.length / 2);
 
     nodes = chart.nodes();
     nodes.normal().height(5);

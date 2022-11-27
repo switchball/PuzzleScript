@@ -5,6 +5,7 @@ class Node {
     constructor(value) {
       this.value = value;
       this.adjacents = []; // adjacency list
+      this.visited = false;
     }
   
     addAdjacent(node) {
@@ -25,6 +26,10 @@ class Node {
   
     isAdjacent(node) {
       return this.adjacents.indexOf(node) > -1;
+    }
+
+    visit() {
+        this.visited = true;
     }
 }
 
@@ -97,7 +102,9 @@ class Graph {
             if(node && !visited.has(node)) {
                 yield node;
                 visited.set(node);
+                node.visit()
                 node.getAdjacents().forEach(adj => visitList.push(adj));
+                // node.getAdjacents().forEach(adj => adj.visit());
             }
         }
     }
