@@ -5,11 +5,22 @@ class Node {
     constructor(value) {
       this.value = value;
       this.adjacents = []; // adjacency list
+      this.backAdjacents = []; // backtrack adjacency list
       this.visited = false;
+      this.group = undefined;
+    }
+
+    getName() {
+        if (this.group) {
+            return 'Group:' + this.group.toString();
+        } else {
+            return new Int32Array(str2ab(this.value));
+        }
     }
   
     addAdjacent(node) {
       this.adjacents.push(node);
+      node.backAdjacents.push(this);
     }
   
     removeAdjacent(node) {
@@ -30,6 +41,10 @@ class Node {
 
     visit() {
         this.visited = true;
+    }
+
+    setGroup(grp) {
+        this.group = grp;
     }
 }
 

@@ -12,7 +12,7 @@ chart.container("container")
 chart.listen('click', function(e) {
     var tag = e.domTarget.tag;
     if (tag) {
-        console.log(`Clicked ${tag.type} with ID ${tag.id}`);
+        console.log(`Clicked ${tag.type} with ID ${tag.id} with Dat ${tag.dat}`);
         if (tag.type == 'node') {
             var dat = tag.id;
             
@@ -22,12 +22,13 @@ chart.listen('click', function(e) {
             printLevel()
             // get attrib from data directly
             // var attrib;
-            // for (var i = 0; i < data.nodes.length; i++) {
-            //     if (data.nodes[i].id === tag.id) {
-            //         attrib = data.nodes[i].attrib;
+            // for (var i = 0; i < nodes.length; i++) {
+            //     if (nodes[i].id === tag.id) {
+            //         attrib = nodes[i].attrib;
             //         break;
             //     }
             // }
+
         }
     }
 })
@@ -39,9 +40,13 @@ function updateStateGraph(stateGraph) {
     var color = ''
     for (let node of stateGraph.nodes.values()) {
         color = node.visited ? '#00aa00' : '#ffa000'
-        nodes.push({id: node.value, fill: color, stroke: '1 #333333'})
+        if (node.visited) {
+            nodes.push({id: node.getName(), fill: color, stroke: '1 #333333', dat: node.value})
+        }
         for (let dest of node.getAdjacents()) {
-            edges.push({from: node.value, to: dest.value})
+            if (node.getName() == dest.getName()) 
+                continue;
+            edges.push({from: node.getName(), to: dest.getName()})
         }
     }
     console.log(nodes)

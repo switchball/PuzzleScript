@@ -36,6 +36,16 @@ async function solverClick_Fn() {
     redraw()
 }
 
+// function featureSpace
+// 指定搜索的特征空间
+
+function groupFn(levelDat) {
+    // levelDat: 已转成文本的关卡数据
+    const levelArr = new Int32Array(str2ab(levelDat));
+    return levelArr
+    // 也可以用 level.objects
+}
+
 function stateSearch(limit=1000) {
     const textDecoder = new TextDecoder()
     const graph = new Graph(Graph.DIRECTED);
@@ -45,16 +55,21 @@ function stateSearch(limit=1000) {
     var start = backupLevel();
 
     var startDat = textDecoder.decode(start.dat);
+    // var startDat = start.dat.toString()
     
     // 添加初始状态，并开始搜索
     const startDatNode = graph.addVertex(startDat)
     var nodeGenerator = graph.bfs(startDatNode);
 
     for (let node of nodeGenerator) {
-        console.log(node);
         rootLevelDat = node.value;
         loadLevelFromNodeDat(rootLevelDat)    // 从编码中恢复关卡，并且调用 restoreLevel(...)
-        // alert(startDat === rootLevelDat)
+        
+        // 获取当前关卡的特征，使用 level.objects
+        feature = [...level.objects].map((value, index) => { if ((value & 16) > 0) {return index} }).filter(e => e >= 0);
+        node.setGroup(feature);
+        console.log(node);
+
         // for each action
         for (var action = 0; action < 4; action++) {
             processInput(action, dontDoWin, false)
@@ -157,6 +172,32 @@ async function bfs(limit=10, updateGraphHandler) {
         await sleep(5)
         redraw()
         console.log('iteration = ' + iteration  + ", #visited state = " + levelSet.size + ' => #to-visit = ' + cache.length)
+    }
+}
+
+function ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint16Array(buf));
+}
+function str2ab(str) {
+    var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i=0, strLen=str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+
+function level2str(level) {
+    return ab2str(level.dat.buffer);
+}
+
+function str2level(str) {
+    // just use str2level().dat is fine to get Array Info
+    return {
+        dat : new Int32Array(str2ab(str)),
+		width : level.width,
+		height : level.height,
+		oldflickscreendat: oldflickscreendat.concat([])
     }
 }
 
