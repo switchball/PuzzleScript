@@ -18,6 +18,8 @@ chart.listen('click', function(e) {
             
             // in solver.js
             loadLevelFromNodeDat(dat);
+            redraw()
+            printLevel()
             // get attrib from data directly
             // var attrib;
             // for (var i = 0; i < data.nodes.length; i++) {
@@ -30,6 +32,19 @@ chart.listen('click', function(e) {
     }
 })
 
+function updateStateGraph(stateGraph) {
+    var nodes = [...stateGraph.nodes.values()].map(function(arr) { return {id: arr.value} } )
+    var edges = []
+    for (let node of stateGraph.nodes.values()) {
+        for (let dest of node.getAdjacents()) {
+            edges.push({from: node.value, to: dest.value})
+        }
+    }
+    console.log(nodes)
+    console.log(edges)
+    updateGraph(nodes, edges);
+}
+
 async function updateGraph(nodes, edges) {
     var data = {nodes: nodes, edges: edges};
     // create a chart and set the data
@@ -38,12 +53,22 @@ async function updateGraph(nodes, edges) {
     // set chart title
     chart.title("Graph Data (" + nodes.length + " nodes)");
     
+    // set nodes size
+    // nodes = chart.nodes();
+    // nodes.normal().height(10);
+    // nodes.hovered().height(30);
+    // nodes.selected().height(40);
     // for (var ic = 0; ic < 500; ic+= 100) {
-        // set chart layout
-        chart.layout().iterationCount(50 + nodes.length);
-        // set chart container and draw
-        chart.draw();
-        await sleep(100);
+    // set chart layout
+    chart.layout().iterationCount(100 + nodes.length);
+
+    nodes = chart.nodes();
+    nodes.normal().height(5);
+    nodes.hovered().height(15);
+    nodes.selected().height(20);
+    // set chart container and draw
+    chart.draw();
+    await sleep(100);
     // }
 
     // alert(100)

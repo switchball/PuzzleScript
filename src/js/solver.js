@@ -23,7 +23,10 @@ async function solverClick_Fn() {
         if (isWin) break;
     }
 
-    bfs(2048, updateGraph)
+    // bfs(2048, updateGraph)
+
+    stateGraph = stateSearch()
+    updateStateGraph(stateGraph)
 
     // restoreLevel(cache[0])
     // var r1 = processInput(1, true, false)
@@ -33,6 +36,66 @@ async function solverClick_Fn() {
     redraw()
 }
 
+function stateSearch(limit=1000) {
+    const textDecoder = new TextDecoder()
+    const graph = new Graph(Graph.DIRECTED);
+    var dontDoWin = true;
+    var iteration = 0;
+    var rootLevelDat, subLevelDat;
+    var start = backupLevel();
+
+    var startDat = textDecoder.decode(start.dat);
+    
+    // 添加初始状态，并开始搜索
+    const startDatNode = graph.addVertex(startDat)
+    var nodeGenerator = graph.bfs(startDatNode);
+
+    for (let node of nodeGenerator) {
+        console.log(node);
+        rootLevelDat = node.value;
+        loadLevelFromNodeDat(rootLevelDat)    // 从编码中恢复关卡，并且调用 restoreLevel(...)
+        // alert(startDat === rootLevelDat)
+        // for each action
+        for (var action = 0; action < 4; action++) {
+            processInput(action, dontDoWin, false)
+            subLevelDat = textDecoder.decode(backupLevel().dat);
+            if (graph.hasVertex(subLevelDat)) {
+                // 状态已存在，连一条边即可
+                graph.addEdge(rootLevelDat, subLevelDat);
+            } else {
+                // 状态不存在，建节点 + 连边
+                graph.addEdge(rootLevelDat, subLevelDat);
+            }
+
+            isWin = checkWin(dontDoWin)
+            if (isWin) {
+                // nodes.push({
+                //     id: 'end', 
+                //     normal: {height: 40, shape: "star5", fill: "#ffa000", stroke: null}
+                // })
+                // edges.push({from: rootDat, to: 'end'})
+                consolePrint('iteration = ' + iteration )
+                // await sleep(10)
+                redraw()
+                // updateGraphHandler(nodes, edges)
+                return graph
+            }
+            loadLevelFromNodeDat(rootLevelDat);
+        }
+        console.log(graph)
+
+        iteration ++;
+
+        if (iteration > limit) {
+            consolePrint('iteration exceed ' + limit + " abort!")
+            return graph;
+        }
+    }
+
+    console.log('stateSearch ' + iteration + " iteration(s)")
+    return graph
+}
+
 async function bfs(limit=10, updateGraphHandler) {
     var textDecoder = new TextDecoder()
     var dontDoWin = true;
@@ -40,24 +103,23 @@ async function bfs(limit=10, updateGraphHandler) {
     var temp, rootLevel, rootDat, subDat;
     var cache = [];
     var levelSet = new Set([]);
+
     cache.push(backupLevel())
+    console.log('level = ')
 
     var nodes = [];
     var edges = [];
 
     while (cache.length > 0 && cache.length <= limit && iteration <= limit) {
+        if (levelSet.size != nodes.length) {
+            console.log('Diff! #levelSet =' + levelSet.size + ', #nodes =' + nodes.length)
+        } 
         // shift the first level element
         rootLevel = cache.shift()
         rootDat = textDecoder.decode(rootLevel.dat)
-        if (levelSet.has(rootDat)) {
-            console.log('visited')
-            continue;
-        }
-        levelSet.add(rootDat)
         if (iteration == 0) {
+            levelSet.add(rootDat)
             nodes.push({id: rootDat, normal: {height: 40, shape: "diamond", fill: "#00bfa5", stroke: null}})   // 添加到 nodes 数组中
-        } else {
-            nodes.push({id: rootDat})
         }
         restoreLevel(rootLevel)    // NOTE: 当状态过多时，可能需要调用 consolidateDiff 来优化
         // for each action
@@ -79,19 +141,21 @@ async function bfs(limit=10, updateGraphHandler) {
 
             temp = backupLevel()
             subDat = textDecoder.decode(temp.dat)
-            // 添加一条边
-            nodes.push({id: subDat})
-            edges.push({from: rootDat, to: subDat})
             if (levelSet.has(subDat)) {
                 // level already visited or to be expanded
+                console.log('expanded!')
             } else {
+                levelSet.add(subDat)
                 cache.push(temp)
+                nodes.push({id: subDat})
             }
+            // 添加一条边
+            edges.push({from: rootDat, to: subDat})
             restoreLevel(rootLevel)
         }
+        iteration ++;
         await sleep(5)
         redraw()
-        iteration ++;
         console.log('iteration = ' + iteration  + ", #visited state = " + levelSet.size + ' => #to-visit = ' + cache.length)
     }
 }
@@ -108,8 +172,6 @@ function loadLevelFromNodeDat(nodeDat) {
 		oldflickscreendat: oldflickscreendat.concat([])
 	};
     restoreLevel(ret);
-    redraw()
-    printLevel()
 }
 
 // QUESTION?
