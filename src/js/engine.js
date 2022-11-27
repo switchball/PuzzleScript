@@ -3026,6 +3026,7 @@ function checkWin(dontDoWin) {
 			DoWin();
 		}
 	}
+	return won;
 }
 
 function DoWin() {

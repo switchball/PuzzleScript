@@ -23,6 +23,9 @@ shareClickLink.addEventListener("click", shareClick, false);
 var levelEditorClickLink = document.getElementById("levelEditorClickLink");
 levelEditorClickLink.addEventListener("click", levelEditorClick_Fn, false);
 
+var solverClickLink = document.getElementById("solverClickLink");
+solverClickLink.addEventListener("click", solverClick_Fn, false);
+
 var exportClickLink = document.getElementById("exportClickLink");
 exportClickLink.addEventListener("click", exportClick, false);
 
